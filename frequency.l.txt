@@ -1,0 +1,58 @@
+%{
+#include <stdio.h>
+#include <string.h>
+
+int count = 0;
+%}
+
+%%
+int main() {
+    char sentence[1000];
+    char word[50];
+
+    printf("Enter a sentence: ");
+    fgets(sentence, sizeof(sentence), stdin);
+
+    printf("Enter the word to count: ");
+    scanf("%s", word);
+
+    yy_scan_string(sentence);
+    yylex(word);
+
+    printf("Frequency of '%s': %d\n", word, count);
+
+    return 0;
+}
+
+%%
+int yylex(char *word) {
+    char token[50];
+
+    while (1) {
+        if (yylex_token(token) == 0)
+            break;
+
+        if (strcmp(token, word) == 0)
+            count++;
+    }
+
+    return 0;
+}
+
+int yylex_token(char *token) {
+    int c;
+    int i = 0;
+
+    while ((c = getchar()) != EOF) {
+        if (c == ' ' || c == '\t' || c == '\n') {
+            if (i > 0) {
+                token[i] = '\0';
+                return 1;
+            }
+        } else {
+            token[i++] = c;
+        }
+    }
+
+    return 0;
+}
